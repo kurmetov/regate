@@ -67,25 +67,28 @@ The case file format is in `src/cases.rs`: `let` names inputs (a `*` makes one c
 
 ## On a real machine
 
-**The setup.** One workstation (59 GB, 32 threads). Up to about a dozen Claude Code sessions at a time
-work on one Rust workspace. Before it merges, a change is checked on a regression set
-of about 50 cases: the program run on real input files, a median of 7 s each, up to 4 minutes.
+**The setup.** One workstation (59 GB, 32 threads), Claude Code sessions working on one Rust workspace:
+up to 22 sessions starting jobs within the same half hour, up to 7 with jobs running at once. Before it
+merges, a change is checked on a regression set of about 50 cases: the program run on real input
+files, a median of 7 s each, up to 4 minutes.
 
 | | Before regate | With regate |
 |---|---|---|
 | builds per check | two, in release: the base and the change | one, of the changed tree, incremental; a tree is never built twice |
-| one build | release with LTO on 2 threads: ~2 min after a small edit, 5.5 min cold | median 44 s, build profile without cross-crate LTO |
+| one build | release with LTO on 2 threads: ~2 min after a small edit | median 44 s, no cross-crate LTO |
 | wait to build | until no other `rustc` ran on the machine: 30+ min with nine sessions | median 0 s, 90th percentile 17 s |
 | the set (~50 cases) | one after another, on both sides: ~15 min | in parallel, the base side from history: median 3.2 min |
 | **one check** | **~20 min**, plus the wait to build | **~4 min** |
-| out of memory | parallel cold builds ran the box out of memory | no OOM kills after the queue's first day |
+| machine out of memory | 12 kernel OOM kills in the 7 days before; systemd-oomd killed the desktop shell | **none** since the queue went in (November 1); 153 processes stopped at their own job's memory cap instead |
 
-Over 25 days with regate: 1,038 checks of the full set, roughly 250 hours of agent waiting saved
-(not counting the waits to build); 33,039 jobs through the queue (9,832 builds, 22,965 heavy runs) from
-558 agent sessions; a job peaked at a median 46 % of its memory cap (builds: 4.6 GB cap, 1.4 GB peak).
+Over the 25 days with regate (November 1-25, 2026): 1,034 checks of the set, roughly 250 hours of agent
+waiting saved (not counting the waits to build); 32,956 jobs through the queue (9,794 builds, 22,920
+heavy runs) from 553 agent sessions; a job peaked at a median 46 % of its memory cap (builds: 4.6 GB
+cap, 1.4 GB peak).
 
-"Before" comes from the old check script and notes made at the time, not from a side-by-side run;
-"with" from the queue's and the gate's own records.
+"Before" for a check comes from the old check script and notes made at the time, not from a
+side-by-side run. The OOM counts are from the kernel's and systemd-oomd's journal; everything else
+from the queue's and the gate's own records.
 
 Jobs peak at under half of what they ask for. That is why admission is by `MemAvailable` and
 learned peaks, not by the sum of caps.
