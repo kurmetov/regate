@@ -934,14 +934,14 @@ mod tests {
     fn a_time_taken_is_not_another_output() {
         let dir = std::env::temp_dir().join(format!("gate-volatile-{}", std::process::id()));
         std::fs::create_dir_all(dir.join("o")).unwrap();
-        let keys = vec!["analysis_time_seconds".to_string(), "processing_time_seconds".to_string()];
+        let keys = vec!["elapsed_seconds".to_string(), "time_s".to_string()];
         let hash = |text: &str| {
             std::fs::write(dir.join("o/r.json"), text).unwrap();
             hash_outputs(&dir, "o", &keys).unwrap()
         };
-        let a = hash(r#"{"area":1,"analysis_time_seconds":9.87,"mto":{"processing_time_seconds":1.0}}"#);
-        assert_eq!(a, hash(r#"{"area":1,"analysis_time_seconds":12.3,"mto":{"processing_time_seconds":2.5}}"#));
-        assert_ne!(a, hash(r#"{"area":2,"analysis_time_seconds":9.87,"mto":{"processing_time_seconds":1.0}}"#));
+        let a = hash(r#"{"rows":1,"elapsed_seconds":9.87,"stats":{"time_s":1.0}}"#);
+        assert_eq!(a, hash(r#"{"rows":1,"elapsed_seconds":12.3,"stats":{"time_s":2.5}}"#));
+        assert_ne!(a, hash(r#"{"rows":2,"elapsed_seconds":9.87,"stats":{"time_s":1.0}}"#));
         assert_ne!(hash_outputs(&dir, "o", &[]).unwrap(), a);
         std::fs::remove_dir_all(&dir).unwrap();
     }

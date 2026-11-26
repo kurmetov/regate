@@ -623,10 +623,10 @@ mod tests {
     /// A machine: T/app the shared root, T/scratch a scratchpad, T/dev/tool a repo of its own.
     fn machine() -> (PathBuf, Conf) {
         let t = std::env::temp_dir().join(format!("gate-guard-{}", std::process::id()));
-        for d in ["app/docs/site", "app/wt/x", "scratch", "dev/tool/.git"] {
+        for d in ["app/docs", "app/wt/x", "scratch", "dev/tool/.git"] {
             std::fs::create_dir_all(t.join(d)).unwrap();
         }
-        std::fs::write(t.join("app/docs/site/SUMMARY.md"), "").unwrap();
+        std::fs::write(t.join("app/docs/index.md"), "").unwrap();
         std::fs::write(t.join("app/wt/x/.git"), "gitdir: elsewhere").unwrap();
         let conf = format!(
             "root = {t}/app\nbuild = scripts/build.sh  # mine\nheavy = scripts/heavy.sh -m <cap>\nheavy_programs = app* python* node\n\
@@ -714,7 +714,7 @@ mod tests {
             "git worktree add ../wt main",
             "git add src/a.rs",
             "echo $(cargo build)",
-            "cd docs/site && git stash",
+            "cd docs && git stash",
         ] {
             assert!(why(c).is_some(), "should refuse: {c}");
         }
@@ -735,9 +735,9 @@ mod tests {
             "git status && git log -1",
             "git push origin main",
             "git stash list",
-            "git checkout --theirs web/docs.json",
-            "git checkout docs/site/SUMMARY.md",
-            "git stash push -q -m x -- web/docs.json",
+            "git checkout --theirs web/data.json",
+            "git checkout docs/index.md",
+            "git stash push -q -m x -- web/data.json",
             "npm run x 2>&1 | tail -1 && git status",
             "cd $T/dev/tool && git stash",
             "cd wt/x && git stash && git checkout main",
@@ -746,7 +746,7 @@ mod tests {
             "mkdir -p $T/dev/tool/src/sub",
             "target/release/app convert data/test/small.dat",
             "app-server --help",
-            "node scripts/shots.mjs target/debug/big.dat.bin",
+            "node scripts/render.mjs target/debug/big.dat.bin",
             "cp data/test/big.dat /dev/null",
             "kill 12345",
             "pgrep -af 'cargo build|rustc'",
