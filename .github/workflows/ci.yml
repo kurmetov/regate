@@ -1,0 +1,19 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable && rustup default stable
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --bins
+      # The queue's load tests run jobs in systemd user scopes: start the runner's user manager.
+      - name: systemd user manager
+        run: |
+          sudo loginctl enable-linger "$USER"
+          echo "XDG_RUNTIME_DIR=/run/user/$(id -u)" >> "$GITHUB_ENV"
+          for i in $(seq 30); do [ -S "/run/user/$(id -u)/bus" ] && break; sleep 1; done
+          XDG_RUNTIME_DIR=/run/user/$(id -u) systemd-run --user --scope -p MemoryMax=100M -p MemorySwapMax=0 true
+      - run: cargo test --test load
+      - run: sh claude-plugin/test/check.sh

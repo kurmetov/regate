@@ -1,0 +1,14 @@
+{
+  "name": "regate",
+  "owner": {
+    "name": "kurmetov"
+  },
+  "description": "regate for Claude Code: a build queue, a regression gate and a guard hook for a shared machine",
+  "plugins": [
+    {
+      "name": "regate",
+      "source": "./claude-plugin",
+      "description": "Build queue, regression gate and guard hook for a machine many Claude Code sessions share"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+[package]
+name = "regate"
+version = "0.1.0"
+edition = "2024"
+description = "regate, a regression gate and build queue for a machine many sessions share: build a project once per source tree, run a fixed set of cases under memory limits, log every run with time and peak memory, and compare"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+debug = false

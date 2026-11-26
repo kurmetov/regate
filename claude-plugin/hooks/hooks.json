@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "command -v regate >/dev/null 2>&1 || exit 0; exec regate guard" }]
+      }
+    ]
+  }
+}

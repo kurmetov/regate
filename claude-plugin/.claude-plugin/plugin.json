@@ -1,0 +1,8 @@
+{
+  "name": "regate",
+  "version": "0.1.0",
+  "description": "Build queue and regression gate for a shared machine: builds and heavy runs wait for memory, cases are judged against their history",
+  "author": {
+    "name": "kurmetov"
+  }
+}
